@@ -1,5 +1,10 @@
 const fallbackUrl = "http://localhost:3000";
 
+function vercelProductionUrl(): string | undefined {
+  const hostname = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  return hostname ? `https://${hostname}` : undefined;
+}
+
 function optionalValue(value: string | undefined): string | undefined {
   const normalized = value?.trim();
   return normalized || undefined;
@@ -27,7 +32,9 @@ function optionalEmail(value: string | undefined): string | undefined {
 
 function getSiteUrl(): URL {
   try {
-    const url = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? fallbackUrl);
+    const url = new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? vercelProductionUrl() ?? fallbackUrl,
+    );
     if (process.env.VERCEL_ENV === "production" && url.protocol !== "https:") {
       throw new Error("Production site URL must use HTTPS");
     }

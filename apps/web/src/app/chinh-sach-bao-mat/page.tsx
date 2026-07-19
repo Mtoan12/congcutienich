@@ -33,9 +33,10 @@ export default function PrivacyPage() {
         <section>
           <h2>Analytics và cookies</h2>
           <p>
-            VietTools chưa bật analytics hoặc quảng cáo. Trong tương lai,
-            website có thể dùng cookies cho đo lường hoặc quảng cáo; chính sách
-            này sẽ được cập nhật trước khi các dịch vụ đó được kích hoạt.
+            VietTools sử dụng Vercel Web Analytics và Speed Insights để đo lượt
+            truy cập, tương tác tổng hợp và hiệu năng website. Nội dung bạn nhập
+            vào các công cụ không được gửi cùng dữ liệu đo lường. VietTools chưa
+            bật quảng cáo.
           </p>
         </section>
         <section>

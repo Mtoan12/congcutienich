@@ -12,17 +12,19 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@viettools/ui": "workspace:*",
-    "@viettools/text-utils": "workspace:*",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "@viettools/developer-utils": "workspace:*",
+    "@viettools/text-utils": "workspace:*",
+    "@viettools/ui": "workspace:*",
     "@viettools/vietnamese-utils": "workspace:*",
     "next": "16.2.10",
     "react": "19.2.7",
     "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@eslint/js": "9.31.0",
     "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.31.0",
     "@tailwindcss/postcss": "4.1.11",
     "@testing-library/jest-dom": "6.6.4",
     "@testing-library/react": "16.3.0",

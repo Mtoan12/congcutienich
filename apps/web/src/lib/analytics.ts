@@ -1,3 +1,5 @@
+import { track } from "@vercel/analytics";
+
 export type AnalyticsEvent =
   | "tool_viewed"
   | "tool_used"
@@ -12,11 +14,6 @@ export function trackEvent(
   event: AnalyticsEvent,
   properties: { tool: string; action?: string },
 ): void {
-  if (!process.env.NEXT_PUBLIC_ANALYTICS_ID || typeof window === "undefined")
-    return;
-  window.dispatchEvent(
-    new CustomEvent("viettools:analytics", {
-      detail: { event, ...properties },
-    }),
-  );
+  if (typeof window === "undefined") return;
+  track(event, properties);
 }

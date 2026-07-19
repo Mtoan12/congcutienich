@@ -38,8 +38,8 @@ Sao chép `.env.example` thành `.env` cho local development. Không commit file
 - `NEXT_PUBLIC_CONTACT_EMAIL`: email hiển thị trên trang liên hệ.
 - `NEXT_PUBLIC_GITHUB_URL`: GitHub hiển thị trên trang liên hệ.
 - `NEXT_PUBLIC_ADSENSE_CLIENT_ID`: giữ trống; quảng cáo thật chưa được tích hợp.
-- `NEXT_PUBLIC_ANALYTICS_ID`: giữ trống khi chưa chọn provider; hiện chưa tải
-  script analytics bên ngoài.
+- Vercel Web Analytics và Speed Insights không cần biến môi trường; cần bật hai
+  tính năng này trong dashboard của Vercel.
 
 Các giá trị tùy chọn rỗng không tạo link hay placeholder. URL GitHub sai định
 dạng cũng không được render. Production bắt buộc dùng `NEXT_PUBLIC_SITE_URL`
@@ -110,12 +110,15 @@ NEXT_PUBLIC_SITE_NAME=VietTools
 NEXT_PUBLIC_CONTACT_EMAIL=dia-chi-lien-he-hop-le
 NEXT_PUBLIC_GITHUB_URL=
 NEXT_PUBLIC_ADSENSE_CLIENT_ID=
-NEXT_PUBLIC_ANALYTICS_ID=
 ```
 
-Kết nối custom domain trước khi coi URL là canonical cuối cùng, cập nhật
-`NEXT_PUBLIC_SITE_URL`, rồi redeploy Production. Chỉ khi deployment ở trạng thái
-Ready mới chạy smoke test production ở trên.
+Với deployment hiện tại, đặt `NEXT_PUBLIC_SITE_URL` thành
+`https://congcutienich-psi.vercel.app`. Nếu bỏ biến này, ứng dụng tự dùng
+`VERCEL_PROJECT_PRODUCTION_URL` do Vercel cung cấp. Kết nối custom domain trước
+khi coi URL là canonical cuối cùng, cập nhật `NEXT_PUBLIC_SITE_URL`, rồi redeploy
+Production. Trong dashboard dự án, bật **Web Analytics** và **Speed Insights**;
+sau đó deploy lại để Vercel bắt đầu thu thập dữ liệu. Chỉ khi deployment ở trạng
+thái Ready mới chạy smoke test production ở trên.
 
 ### Launch operations
 
