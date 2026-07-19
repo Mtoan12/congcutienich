@@ -13,14 +13,16 @@ test.afterEach(() =>
 );
 
 test("homepage loads", async ({ page }) => {
-  await page.goto("/");
+  const response = await page.goto("/");
+  expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Công cụ trực tuyến",
   );
 });
 
 test("directory lists 14 tools", async ({ page }) => {
-  await page.goto("/cong-cu");
+  const response = await page.goto("/cong-cu");
+  expect(response?.status()).toBe(200);
   await expect(page.getByText(/Tìm thấy/)).toContainText("14");
   await expect(page.locator(".tool-card")).toHaveCount(14);
 });
@@ -90,6 +92,80 @@ test("robots responds and references sitemap", async ({ request }) => {
   const response = await request.get("/robots.txt");
   expect(response.ok()).toBe(true);
   expect(await response.text()).toContain("sitemap.xml");
+});
+
+test("manifest and icon assets are public", async ({ request }) => {
+  for (const path of [
+    "/manifest.webmanifest",
+    "/icon.png",
+    "/favicon-32.png",
+    "/apple-touch-icon.png",
+    "/icon-192.png",
+    "/icon-512.png",
+  ]) {
+    const response = await request.get(path);
+    expect(response.ok(), path).toBe(true);
+  }
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.start_url).toBe("/");
+});
+
+test("production security headers are present", async ({ request }) => {
+  const response = await request.get("/");
+  expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(response.headers()["referrer-policy"]).toBe(
+    "strict-origin-when-cross-origin",
+  );
+  expect(response.headers()["permissions-policy"]).toContain("camera=()");
+  expect(response.headers()["x-frame-options"]).toBe("SAMEORIGIN");
+});
+
+test("unknown routes show a safe not-found page", async ({ page }) => {
+  const response = await page.goto("/route-khong-ton-tai");
+  expect(response?.status()).toBe(404);
+  browserErrors.length = 0;
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("404");
+  await expect(page.getByRole("link", { name: /công cụ/u })).toBeVisible();
+});
+
+test("tool input is not submitted over the network", async ({ page }) => {
+  const leaks: string[] = [];
+  const marker = "PRIVATE_INPUT_125430";
+  page.on("request", (request) => {
+    const payload = `${request.url()} ${request.postData() ?? ""}`;
+    if (payload.includes(marker)) leaks.push(request.url());
+  });
+  await page.goto("/cong-cu/json-formatter");
+  await page.getByLabel("Dữ liệu đầu vào").fill(`{"value":"${marker}"}`);
+  await expect(page.getByLabel("Kết quả")).toHaveValue(new RegExp(marker, "u"));
+  await page.waitForTimeout(250);
+  expect(leaks).toEqual([]);
+});
+
+test("production metadata uses one secure canonical origin", async ({
+  page,
+}) => {
+  test.skip(!process.env.PLAYWRIGHT_BASE_URL, "Production-only metadata audit");
+  const expectedOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL!).origin;
+  for (const path of [
+    "/",
+    "/cong-cu",
+    "/cong-cu/chuyen-so-thanh-chu",
+    "/cong-cu/json-formatter",
+    "/cong-cu/jwt-decoder",
+  ]) {
+    await page.goto(path);
+    const canonicals = page.locator('link[rel="canonical"]');
+    await expect(canonicals).toHaveCount(1);
+    const canonical = await canonicals.getAttribute("href");
+    expect(canonical).toBeTruthy();
+    expect(new URL(canonical!).protocol).toBe("https:");
+    expect(new URL(canonical!).origin).toBe(expectedOrigin);
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+      "content",
+      new RegExp(`^${expectedOrigin.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}`),
+    );
+  }
 });
 
 test("all tools render core UI without horizontal body overflow", async ({

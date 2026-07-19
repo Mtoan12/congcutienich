@@ -13,8 +13,12 @@ export const metadata: Metadata = {
   description:
     "Xử lý văn bản, dữ liệu và nội dung tiếng Việt nhanh chóng ngay trên trình duyệt.",
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    shortcut: "/icon.png",
+    icon: [
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon-32.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   alternates: { canonical: "/" },
   openGraph: {

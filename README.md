@@ -30,13 +30,20 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Environment variables tùy chọn:
+Sao chép `.env.example` thành `.env` cho local development. Không commit file
+`.env` hoặc token. Các biến:
 
 - `NEXT_PUBLIC_SITE_URL`: URL dùng cho canonical, sitemap và JSON-LD.
 - `NEXT_PUBLIC_SITE_NAME`: tên website.
 - `NEXT_PUBLIC_CONTACT_EMAIL`: email hiển thị trên trang liên hệ.
 - `NEXT_PUBLIC_GITHUB_URL`: GitHub hiển thị trên trang liên hệ.
-- `NEXT_PUBLIC_ANALYTICS_ID`: chỉ bật abstraction event cục bộ; chưa có provider thật.
+- `NEXT_PUBLIC_ADSENSE_CLIENT_ID`: giữ trống; quảng cáo thật chưa được tích hợp.
+- `NEXT_PUBLIC_ANALYTICS_ID`: giữ trống khi chưa chọn provider; hiện chưa tải
+  script analytics bên ngoài.
+
+Các giá trị tùy chọn rỗng không tạo link hay placeholder. URL GitHub sai định
+dạng cũng không được render. Production bắt buộc dùng `NEXT_PUBLIC_SITE_URL`
+HTTPS thực tế và một `NEXT_PUBLIC_CONTACT_EMAIL` phù hợp.
 
 ## How to add a new tool
 
@@ -71,9 +78,59 @@ pnpm test:e2e
 
 Playwright khởi động web app cục bộ và chạy Chromium smoke tests cho homepage, directory/search, các luồng đại diện, mobile menu, internal links, sitemap và robots.
 
-## Deployment và roadmap
+Để smoke test domain production mà không khởi động server local:
 
-Deployment được để dành cho phase sau. Trước deployment cần cấu hình domain/environment production, provider analytics/quảng cáo nếu được phê duyệt, kiểm tra trình duyệt thật và thiết lập CI release. Roadmap tiếp theo tập trung hardening, E2E smoke, performance profiling và deployment preparation.
+```bash
+PLAYWRIGHT_BASE_URL=https://your-domain.example pnpm test:e2e
+```
+
+Suite production kiểm tra thêm canonical HTTPS và Open Graph origin. Không đặt
+URL production trực tiếp trong source.
+
+## Production deployment (Vercel)
+
+Cấu hình khuyến nghị cho pnpm/Turborepo monorepo:
+
+- Import Git repository vào Vercel, Framework Preset `Next.js`.
+- Root Directory: `apps/web` (Vercel vẫn phát hiện workspace và dùng lockfile ở
+  repository root).
+- Package manager: pnpm; Node.js: 22.x.
+- Install Command: `pnpm install --frozen-lockfile`.
+- Build Command: `cd ../.. && pnpm turbo build --filter=@viettools/web`.
+- Output Directory: để trống, dùng Next.js managed output.
+- Production branch: `master` (hoặc đổi theo branch release thực tế trước khi
+  kết nối Git).
+
+Không cần `vercel.json`; dashboard monorepo settings tránh ghi đè Next.js
+managed output. Trước lần deploy đầu, cấu hình Production environment variables:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://domain-thuc-te.example
+NEXT_PUBLIC_SITE_NAME=VietTools
+NEXT_PUBLIC_CONTACT_EMAIL=dia-chi-lien-he-hop-le
+NEXT_PUBLIC_GITHUB_URL=
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=
+NEXT_PUBLIC_ANALYTICS_ID=
+```
+
+Kết nối custom domain trước khi coi URL là canonical cuối cùng, cập nhật
+`NEXT_PUBLIC_SITE_URL`, rồi redeploy Production. Chỉ khi deployment ở trạng thái
+Ready mới chạy smoke test production ở trên.
+
+### Launch operations
+
+- Search Console: tạo Domain hoặc URL-prefix property, xác minh quyền sở hữu,
+  submit `https://domain-thuc-te.example/sitemap.xml`; chỉ request indexing trang
+  chủ, `/cong-cu` và 2–3 công cụ chính ban đầu.
+- Availability: theo dõi Vercel deployment status; có thể tạo monitor HTTPS cho
+  `/` bằng UptimeRobot hoặc Better Stack sau khi chủ dự án có tài khoản.
+- Errors: theo dõi build/function logs và console error từ Playwright. Chưa thêm
+  Sentry khi không có DSN.
+- CSP đầy đủ được hoãn đến khi chốt analytics/AdSense để không khóa nhầm script
+  Next.js hay provider tương lai. Các header `nosniff`, referrer, permissions và
+  chống iframe đã bật trong `next.config.ts`.
+- Lighthouse mobile cần chạy trên `/`, `/cong-cu/chuyen-so-thanh-chu` và
+  `/cong-cu/json-formatter` sau khi custom domain hoạt động; ghi lại cả bốn score.
 
 ## License
 
