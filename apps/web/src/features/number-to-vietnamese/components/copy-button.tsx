@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
 
 type CopyStatus = "idle" | "copied" | "failed";
 
@@ -17,8 +18,7 @@ export function CopyButton({ value }: { value: string }) {
 
   const copy = async () => {
     try {
-      if (!navigator.clipboard) throw new Error("Clipboard API unavailable");
-      await navigator.clipboard.writeText(value);
+      if (!(await copyToClipboard(value))) throw new Error("Copy failed");
       setStatus("copied");
       trackEvent("result_copied", { tool: "number-to-vietnamese" });
     } catch {

@@ -10,10 +10,12 @@
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "test:coverage": "turbo test:coverage",
+    "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "prettier": "3.6.2",
     "turbo": "2.5.5"
   }

@@ -1,85 +1,79 @@
 # VietTools
 
-VietTools is a free, privacy-first collection of browser-based utilities designed for Vietnamese users. Sprint 1 delivers a production-ready Vietnamese number-to-words converter.
+VietTools là bộ công cụ tiếng Việt, xử lý văn bản và dữ liệu dành cho trình duyệt. Phase 2 có 14 công cụ hoạt động, không có backend và không gửi dữ liệu người dùng lên máy chủ.
 
-## Features
+## Công cụ hiện có
 
-- Vietnamese integer-to-words conversion, including negative and very large values
-- Vietnamese currency and capitalization modes
-- Thousand separators using dots, commas, or spaces
-- Responsive, keyboard-accessible interface
-- Static SEO content, JSON-LD, sitemap, robots rules, and legal pages
-- Client-side processing: tool input is never sent to a server
+- Tiếng Việt: Chuyển số thành chữ, Xóa dấu, Tạo slug, Chuyển kiểu chữ, Đếm từ và ký tự.
+- Văn bản: Chuẩn hóa khoảng trắng, Xóa dòng trùng, Sắp xếp danh sách, So sánh văn bản, Tìm và thay thế, Xóa dòng trống.
+- Developer: JSON Formatter & Validator, JSON sang TypeScript, JWT Decoder.
 
-## Tech stack
-
-Next.js App Router, React, TypeScript strict mode, Tailwind CSS, pnpm workspaces, Turborepo, Vitest, React Testing Library, ESLint, and Prettier. The project is ready for Playwright scenarios when browser-level coverage is added.
-
-## Repository structure
+## Kiến trúc
 
 ```text
-apps/web                       Next.js application
-packages/ui                    Shared UI primitives
-packages/vietnamese-utils      Pure Vietnamese-language utilities and tests
-packages/text-utils            Phase 3 package placeholder
-packages/config                Shared TypeScript and formatting configuration
+apps/web                         Next.js App Router và shared tool UI
+apps/web/src/lib/tool-registry.ts Nguồn dữ liệu duy nhất cho tool
+packages/vietnamese-utils        Pure utilities tiếng Việt
+packages/text-utils              Pure text utilities
+packages/developer-utils         Pure JSON, TypeScript và JWT utilities
+packages/ui                      UI primitives dùng chung
 ```
+
+Registry cung cấp dữ liệu cho trang chủ, `/cong-cu`, search/filter, related tools và sitemap. Các route dùng `ToolPage` và `ToolWorkbench` để chia sẻ breadcrumb, input/output, actions, privacy, FAQ, JSON-LD và responsive layout.
 
 ## Local development
 
-Prerequisites: Node.js 22+ and pnpm 10+.
+Yêu cầu Node.js 22+ và pnpm 10+.
 
 ```bash
-pnpm install
-cp .env.example apps/web/.env.local
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open `http://localhost:3000`.
+Environment variables tùy chọn:
 
-## Environment variables
+- `NEXT_PUBLIC_SITE_URL`: URL dùng cho canonical, sitemap và JSON-LD.
+- `NEXT_PUBLIC_SITE_NAME`: tên website.
+- `NEXT_PUBLIC_CONTACT_EMAIL`: email hiển thị trên trang liên hệ.
+- `NEXT_PUBLIC_GITHUB_URL`: GitHub hiển thị trên trang liên hệ.
+- `NEXT_PUBLIC_ANALYTICS_ID`: chỉ bật abstraction event cục bộ; chưa có provider thật.
 
-Copy `.env.example` to `apps/web/.env.local`. `NEXT_PUBLIC_SITE_URL` is used as the single source for canonical URLs, sitemap, robots, and JSON-LD. Contact and GitHub values have safe development fallbacks. Analytics and AdSense remain disabled when their IDs are blank.
+## How to add a new tool
 
-## Available scripts
+1. Tạo pure utility trong package phù hợp và export qua `src/index.ts`.
+2. Viết unit test, gồm empty/invalid/options/Unicode nếu liên quan.
+3. Đăng ký tool một lần trong `apps/web/src/lib/tool-registry.ts`.
+4. Tạo route mỏng dùng `ToolPage`; thêm nghiệp vụ vào workbench/component chuyên biệt.
+5. Thêm metadata, hướng dẫn, ví dụ, privacy và FAQ hiển thị thật.
+6. Chọn related tools qua category/registry, không hard-code danh sách ở page.
+7. Chạy `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:coverage` và `pnpm build`.
 
-- `pnpm dev` — start workspace development tasks
-- `pnpm build` — build all packages and the web application
-- `pnpm lint` — lint all workspaces
-- `pnpm typecheck` — run TypeScript checks
-- `pnpm test` — run unit and component tests
-- `pnpm test:coverage` — run tests with coverage thresholds
-- `pnpm format` / `pnpm format:check` — write or check formatting
+Để thêm utility package, tạo workspace dưới `packages/`, cung cấp typed exports, `build/lint/typecheck/test/test:coverage`, Vitest thresholds và thêm dependency workspace vào consumer.
 
 ## Testing
 
-The number converter is covered by Vitest cases for digits, tens, hundreds, missing hundreds, grouped input, negative values, options, invalid input, and large values. React Testing Library covers conversion, clearing, examples, and accessible errors.
-
-```bash
-pnpm test
-pnpm test:coverage
-```
-
-## Deployment
-
-Import the repository into Vercel, select `apps/web` only if Vercel does not auto-detect the Turborepo, and configure the variables from `.env.example`. The standard build command is `pnpm build`. Deployment itself is intentionally not automated from CI because it requires project credentials and domain ownership.
+Utility packages áp dụng coverage: statements/functions/lines ≥90%, branches ≥85%. Vitest và React Testing Library kiểm tra utilities, clipboard fallback, registry search/filter và các tương tác quan trọng của tool.
 
 ## Privacy principles
 
-User-entered values are converted locally in the browser. They are not persisted, included in URLs, logged, or attached to analytics events. The analytics abstraction accepts only a tool identifier. No authentication, database, or separate backend is used.
+Input/output được xử lý client-side, không lưu trong localStorage, không đưa vào URL và không gửi trong analytics. JWT chỉ được decode, không xác minh chữ ký. Không có account, database, payment, cloud storage hoặc AI API.
 
-## Technical decisions
+## Scripts
 
-- Integer input is processed as strings to prevent JavaScript number precision loss.
-- Decimal input is deferred to a later phase; ambiguous decimal/thousand formats are rejected.
-- The converter accepts up to 66 digits, a clear product guardrail that still exceeds common usage.
-- Pages remain Server Components; only navigation and converter interactions opt into client JavaScript.
-- Ad placeholders appear only in development. Production renders no ad without a future integration.
+`pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:coverage`, `pnpm format`, `pnpm format:check`.
 
-## Roadmap
+### E2E smoke tests
 
-- Phase 2: Vietnamese diacritic removal, slug generation, word counting, and case conversion
-- Phase 3: list sorting/deduplication, text diff, whitespace normalization, and multi-value replacement
+```bash
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+Playwright khởi động web app cục bộ và chạy Chromium smoke tests cho homepage, directory/search, các luồng đại diện, mobile menu, internal links, sitemap và robots.
+
+## Deployment và roadmap
+
+Deployment được để dành cho phase sau. Trước deployment cần cấu hình domain/environment production, provider analytics/quảng cáo nếu được phê duyệt, kiểm tra trình duyệt thật và thiết lập CI release. Roadmap tiếp theo tập trung hardening, E2E smoke, performance profiling và deployment preparation.
 
 ## License
 

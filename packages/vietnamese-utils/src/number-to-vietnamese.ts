@@ -1,7 +1,6 @@
 export interface NumberToVietnameseOptions {
   currency?: boolean;
   capitalize?: boolean;
-  decimalMode?: "digit-by-digit" | "number";
   zeroHundreds?: boolean;
 }
 

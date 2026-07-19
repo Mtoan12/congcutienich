@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@viettools/ui": "workspace:*",
+    "@viettools/text-utils": "workspace:*",
+    "@viettools/developer-utils": "workspace:*",
     "@viettools/vietnamese-utils": "workspace:*",
-    "next": "15.4.4",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
     "@eslint/js": "9.31.0",
@@ -29,7 +31,7 @@
     "@types/react-dom": "19.1.6",
     "@vitest/coverage-v8": "3.2.4",
     "eslint": "9.31.0",
-    "eslint-config-next": "15.4.4",
+    "eslint-config-next": "16.2.10",
     "jsdom": "26.1.0",
     "tailwindcss": "4.1.11",
     "typescript": "5.8.3",

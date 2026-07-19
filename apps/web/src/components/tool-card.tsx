@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { CalculatorIcon } from "./icons";
+import type { ToolDefinition } from "@/lib/tool-registry";
 
-export function ToolCard() {
+export function ToolCard({ tool }: { tool: ToolDefinition }) {
   return (
-    <Link className="card tool-card" href="/cong-cu/chuyen-so-thanh-chu">
+    <Link className="card tool-card" href={tool.path}>
       <span className="icon-box">
-        <CalculatorIcon />
+        <span aria-hidden="true" className="tool-glyph">
+          {tool.name.slice(0, 1)}
+        </span>
       </span>
-      <h3>Chuyển số thành chữ</h3>
-      <p>Đọc số nguyên và số tiền thành chữ tiếng Việt chính xác.</p>
+      <h3>{tool.name}</h3>
+      <p>{tool.shortDescription}</p>
     </Link>
   );
 }

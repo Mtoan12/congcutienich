@@ -17,21 +17,36 @@ export default function ContactPage() {
             Gửi góp ý, báo lỗi hoặc đề xuất công cụ mới cho VietTools.
           </p>
         </header>
-        <section>
-          <h2>Email</h2>
-          <p>
-            <a
-              href={`mailto:${siteConfig.contactEmail}`}
-              style={{
-                color: "var(--primary-dark)",
-                textDecoration: "underline",
-              }}
-            >
-              {siteConfig.contactEmail}
-            </a>
-          </p>
-        </section>
-      
+        {siteConfig.contactEmail && (
+          <section>
+            <h2>Email</h2>
+            <p>
+              <a
+                href={`mailto:${siteConfig.contactEmail}`}
+                style={{
+                  color: "var(--primary-dark)",
+                  textDecoration: "underline",
+                }}
+              >
+                {siteConfig.contactEmail}
+              </a>
+            </p>
+          </section>
+        )}
+        {siteConfig.githubUrl && (
+          <section>
+            <h2>GitHub</h2>
+            <p>
+              <a
+                href={siteConfig.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Xem mã nguồn VietTools
+              </a>
+            </p>
+          </section>
+        )}
       </article>
     </Container>
   );

@@ -33,10 +33,9 @@ export default function PrivacyPage() {
         <section>
           <h2>Analytics và cookies</h2>
           <p>
-            VietTools chưa bật analytics hoặc quảng cáo. Trong
-            tương lai, website có thể dùng cookies cho đo lường hoặc quảng cáo;
-            chính sách này sẽ được cập nhật trước khi các dịch vụ đó được kích
-            hoạt.
+            VietTools chưa bật analytics hoặc quảng cáo. Trong tương lai,
+            website có thể dùng cookies cho đo lường hoặc quảng cáo; chính sách
+            này sẽ được cập nhật trước khi các dịch vụ đó được kích hoạt.
           </p>
         </section>
         <section>

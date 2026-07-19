@@ -8,7 +8,11 @@
     },
     "lint": { "dependsOn": ["^lint"] },
     "typecheck": { "dependsOn": ["^typecheck"] },
-    "test": { "dependsOn": ["^build"], "outputs": ["coverage/**"] },
-    "test:coverage": { "dependsOn": ["^build"], "outputs": ["coverage/**"] }
+    "test": { "dependsOn": ["^build"], "cache": false },
+    "test:coverage": { "dependsOn": ["^build"], "cache": false },
+    "@viettools/developer-utils#build": { "cache": false },
+    "@viettools/text-utils#build": { "cache": false },
+    "@viettools/ui#build": { "cache": false },
+    "@viettools/vietnamese-utils#build": { "cache": false }
   }
 }
